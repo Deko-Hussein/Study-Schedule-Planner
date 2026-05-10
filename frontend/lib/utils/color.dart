@@ -1,32 +1,32 @@
-import "package:flutter/material.dart";
+import 'package:flutter/material.dart';
 
 class AppColor {
   AppColor._();
 
   // Background Colors
-  static Color kbgColor = const Color(0xFFF8FAFC);
-  static Color kbgColor2 = const Color(0xFFFFFFFF);
+  static const Color kbgColor  = Color(0xFFF0F4F8);   // soft blue-gray background
+  static const Color kbgColor2 = Color(0xFFFFFFFF);
 
-  // Primary Brand Colors
-  static Color kPrimaryColor = const Color(0xFF4F46E5); 
-  static Color kSecondColor = const Color(0xFF0F172A); 
+  // Primary Brand Colors  (blue to match screenshots)
+  static const Color kPrimaryColor  = Color(0xFF2563EB);  // bright blue
+  static const Color kSecondColor   = Color(0xFF0F172A);  // dark navy
 
   // Text Colors
-  static Color kTextStyleColor = const Color(0xFF1E293B);
-  static Color kTextStyleColorGray = const Color(0xFF94A3B8);
+  static const Color kTextStyleColor     = Color(0xFF1E293B);
+  static const Color kTextStyleColorGray = Color(0xFF94A3B8);
 
   // Border Colors
-  static const Color borderPrimary = Color(0xFFE2E8F0);
+  static const Color borderPrimary   = Color(0xFFE2E8F0);
   static const Color borderSecondary = Color(0xFFF1F5F9);
 
   // Button Colors
-  static const Color buttonPrimary = Color(0xFF4F46E5);
+  static const Color buttonPrimary   = Color(0xFF2563EB);
   static const Color buttonSecondary = Color(0xFF0F172A);
-  static const Color buttonDisabled = Color(0xFFCBD5E1);
+  static const Color buttonDisabled  = Color(0xFFCBD5E1);
 
   // Success / Completed Task
-  static const Color kCheckInActiveTextColor = Color(0xFF16A34A);
-  static const Color kcheckInInActiveBgColor = Color(0xFFDCFCE7);
+  static const Color kCheckInActiveTextColor  = Color(0xFF16A34A);
+  static const Color kcheckInInActiveBgColor  = Color(0xFFDCFCE7);
 
   // Error / Urgent Task
   static const Color kCheckOutActiveTextColor = Color(0xFFDC2626);
