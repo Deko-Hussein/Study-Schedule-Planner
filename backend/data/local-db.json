@@ -1,0 +1,61 @@
+{
+  "users": [
+    {
+      "_id": "a8de9c9e-7603-4cb4-a38f-7c23a31a9433",
+      "name": "Test User",
+      "email": "test@example.com",
+      "password": "$2a$10$odY9ZWMoLhEhsB4rPrkzw.9fMjijqL18jxtjMUN4DST0yRznsTpOO",
+      "major": "CS",
+      "avatar": "",
+      "subscription": "free",
+      "notifications": {
+        "reminderTime": "15 Mins",
+        "alertSound": "Classic Chime"
+      },
+      "createdAt": "2026-05-11T17:29:05.878Z",
+      "updatedAt": "2026-05-11T17:29:05.878Z"
+    }
+  ],
+  "subjects": [
+    {
+      "_id": "67b18531-d2ca-4573-a803-cb1d6e2340fd",
+      "user": "a8de9c9e-7603-4cb4-a38f-7c23a31a9433",
+      "name": "Math",
+      "color": "#123456",
+      "creditHours": 4,
+      "icon": "book",
+      "createdAt": "2026-05-11T17:29:06.194Z",
+      "updatedAt": "2026-05-11T17:29:06.194Z"
+    }
+  ],
+  "schedules": [
+    {
+      "_id": "c77fbaa8-e9ad-469f-bdcf-ad6e5ceece56",
+      "user": "a8de9c9e-7603-4cb4-a38f-7c23a31a9433",
+      "subject": "67b18531-d2ca-4573-a803-cb1d6e2340fd",
+      "title": "Study block",
+      "date": "2026-05-11",
+      "startTime": "08:00",
+      "endTime": "10:00",
+      "notes": "Library",
+      "completed": false,
+      "createdAt": "2026-05-11T17:29:06.216Z",
+      "updatedAt": "2026-05-11T17:29:06.216Z"
+    }
+  ],
+  "tasks": [
+    {
+      "_id": "7a0fdd17-d7f0-45fb-9ad7-76dad4524476",
+      "user": "a8de9c9e-7603-4cb4-a38f-7c23a31a9433",
+      "subject": "67b18531-d2ca-4573-a803-cb1d6e2340fd",
+      "title": "Read chapter",
+      "description": "",
+      "dueDate": null,
+      "priority": "high",
+      "completed": false,
+      "completedAt": null,
+      "createdAt": "2026-05-11T17:29:06.207Z",
+      "updatedAt": "2026-05-11T17:29:06.207Z"
+    }
+  ]
+}
