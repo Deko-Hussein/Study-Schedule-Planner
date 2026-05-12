@@ -1,0 +1,133 @@
+import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../config/app_config.dart';
+import '../services/api_service.dart';
+
+class AuthProvider extends ChangeNotifier {
+  Map<String, dynamic>? _user;
+  bool _loading = false;
+  String? _error;
+
+  Map<String, dynamic>? get user => _user;
+  bool get loading => _loading;
+  String? get error => _error;
+  bool get isLoggedIn => _user != null;
+
+  String get userName => _user?['name']?.toString() ?? '';
+  String get userEmail => _user?['email']?.toString() ?? '';
+  String get userMajor => _user?['major']?.toString() ?? '';
+  String get userAvatar => _user?['avatar']?.toString() ?? '';
+  String get subscription => _user?['subscription']?.toString() ?? 'free';
+  Map<String, dynamic> get notifications =>
+      (_user?['notifications'] as Map<String, dynamic>?) ??
+      {'reminderTime': '15 Mins', 'alertSound': 'Classic Chime'};
+
+  AuthProvider() {
+    _loadCached();
+  }
+
+  Future<void> _loadCached() async {
+    final prefs = await SharedPreferences.getInstance();
+    final cached = prefs.getString(AppConfig.userKey);
+    if (cached != null) {
+      _user = jsonDecode(cached) as Map<String, dynamic>;
+      notifyListeners();
+      // refresh from server silently
+      _refreshProfile();
+    }
+  }
+
+  Future<void> _refreshProfile() async {
+    try {
+      final data = await ApiService.getMe();
+      _cacheUser(data['user'] as Map<String, dynamic>);
+    } catch (_) {}
+  }
+
+  void _cacheUser(Map<String, dynamic> user) async {
+    _user = user;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(AppConfig.userKey, jsonEncode(user));
+    notifyListeners();
+  }
+
+  Future<bool> register({
+    required String name,
+    required String email,
+    required String password,
+    String? major,
+  }) async {
+    _loading = true;
+    _error = null;
+    notifyListeners();
+    try {
+      final data = await ApiService.register(
+          name: name, email: email, password: password, major: major);
+      await ApiService.saveToken(data['token'] as String);
+      _cacheUser(data['user'] as Map<String, dynamic>);
+      return true;
+    } on ApiException catch (e) {
+      _error = e.message;
+      return false;
+    } catch (e) {
+      _error = 'Connection error. Is the backend running?';
+      return false;
+    } finally {
+      _loading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> login({required String email, required String password}) async {
+    _loading = true;
+    _error = null;
+    notifyListeners();
+    try {
+      final data = await ApiService.login(email: email, password: password);
+      await ApiService.saveToken(data['token'] as String);
+      _cacheUser(data['user'] as Map<String, dynamic>);
+      return true;
+    } on ApiException catch (e) {
+      _error = e.message;
+      return false;
+    } catch (e) {
+      _error = 'Connection error. Is the backend running?';
+      return false;
+    } finally {
+      _loading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> logout() async {
+    await ApiService.clearToken();
+    _user = null;
+    notifyListeners();
+  }
+
+  Future<bool> updateProfile(Map<String, dynamic> data) async {
+    _loading = true;
+    _error = null;
+    notifyListeners();
+    try {
+      final result = await ApiService.updateMe(data);
+      _cacheUser(result['user'] as Map<String, dynamic>);
+      return true;
+    } on ApiException catch (e) {
+      _error = e.message;
+      return false;
+    } catch (e) {
+      _error = 'Connection error';
+      return false;
+    } finally {
+      _loading = false;
+      notifyListeners();
+    }
+  }
+
+  void clearError() {
+    _error = null;
+    notifyListeners();
+  }
+}
