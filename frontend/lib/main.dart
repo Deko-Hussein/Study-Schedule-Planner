@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'providers/auth_provider.dart';
-import 'screens/splash_screen.dart';
-import 'utils/color.dart';
+import 'utils/exports.dart';
 
 void main() {
   runApp(
@@ -25,10 +23,8 @@ class StudyPlannerApp extends StatelessWidget {
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
           seedColor: AppColor.kPrimaryColor,
-          brightness: Brightness.light,
         ),
         scaffoldBackgroundColor: AppColor.kbgColor,
-        splashFactory: InkRipple.splashFactory,
       ),
       home: const SplashScreen(),
     );

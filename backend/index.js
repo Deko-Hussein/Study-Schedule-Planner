@@ -1,37 +1,49 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-require('dotenv').config();
+const path = require("path");
+const express = require("express");
+const cors = require("cors");
+require("dotenv").config({ path: path.join(__dirname, ".env") });
+const connectDB = require("./config/db.js");
+const { isDbConnected } = require("./utils/dbState");
+const { DB_PATH } = require("./utils/localDb");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/study_planner';
 
-// ── Middleware ────────────────────────────────────────────────────────────────
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ── MongoDB Connection ────────────────────────────────────────────────────────
-mongoose.connect(MONGO_URI)
-  .then(() => console.log('✅  MongoDB connected'))
-  .catch(err => console.error('❌  MongoDB connection error:', err.message));
+app.use("/api/auth", require("./routes/auth"));
+app.use("/api/users", require("./routes/users"));
+app.use("/api/subjects", require("./routes/subjects"));
+app.use("/api/schedules", require("./routes/schedules"));
+app.use("/api/reminders", require("./routes/reminders"));
+app.use("/api/tasks", require("./routes/tasks"));
 
-// ── Routes ────────────────────────────────────────────────────────────────────
-app.use('/api/auth',      require('./routes/auth'));
-app.use('/api/users',     require('./routes/users'));
-app.use('/api/subjects',  require('./routes/subjects'));
-app.use('/api/schedules', require('./routes/schedules'));
-app.use('/api/reminders', require('./routes/reminders'));
-app.use('/api/tasks',     require('./routes/tasks'));
-
-// ── Health check ──────────────────────────────────────────────────────────────
-app.get('/', (req, res) => res.json({ status: 'Study Planner API running 🚀' }));
-
-// ── Global error handler ──────────────────────────────────────────────────────
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(err.status || 500).json({ error: err.message || 'Internal Server Error' });
+app.get("/", (req, res) => {
+  res.json({
+    status: "Study Planner API running",
+  });
 });
 
-app.listen(PORT, () => console.log(`🚀  Server running on http://localhost:${PORT}`));
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+
+  res.status(err.status || 500).json({
+    error: err.message || "Internal Server Error",
+  });
+});
+
+const startServer = async () => {
+  await connectDB();
+
+  app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+
+    if (!isDbConnected()) {
+      console.log(`Local data fallback active: ${DB_PATH}`);
+    }
+  });
+};
+
+startServer();
