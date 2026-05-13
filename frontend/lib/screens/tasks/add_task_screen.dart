@@ -21,19 +21,19 @@ class TaskIconly {
   static const IconData timeBold = IconlyBold.time_circle;
 }
 
-class NewTaskScreen extends StatefulWidget {
+class AddTaskScreen extends StatefulWidget {
   final VoidCallback? onTaskSaved;
 
-  const NewTaskScreen({
+  const AddTaskScreen({
     super.key,
     this.onTaskSaved,
   });
 
   @override
-  State<NewTaskScreen> createState() => _NewTaskScreenState();
+  State<AddTaskScreen> createState() => _AddTaskScreenState();
 }
 
-class _NewTaskScreenState extends State<NewTaskScreen> {
+class _AddTaskScreenState extends State<AddTaskScreen> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _notesController = TextEditingController();
@@ -143,6 +143,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
         await ApiService.createTask({
           'title': _titleController.text.trim(),
           'description': _notesController.text.trim(),
+          'category': _category,
           'dueDate': dueDate.toIso8601String(),
           'priority': _category == 'Exam' ? 'high' : 'medium',
         });
@@ -163,6 +164,20 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
       );
 
       widget.onTaskSaved?.call();
+      if (token != null) {
+        _formKey.currentState?.reset();
+        _titleController.clear();
+        _notesController.clear();
+        setState(() {
+          _taskDate = DateTime.now();
+          _taskTime = TimeOfDay.now();
+          _dueDate = null;
+          _reminderEnabled = true;
+          _reminderTime = _subtractMinutes(TimeOfDay.now(), 15);
+          _category = 'Study';
+          _recurrence = 'None';
+        });
+      }
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -317,9 +332,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                     child: _pickerTile(
                       label: 'DUE DATE (OPTIONAL)',
                       icon: TaskIconly.calendarBold,
-                      value: _dueDate == null
-                          ? 'mm/dd/yyyy'
-                          : _dateLabel(_dueDate!),
+                      value: _dueDate == null ? 'mm/dd/yyyy' : _dateLabel(_dueDate!),
                       trailingIcon: TaskIconly.calendar,
                       onTap: () => _pickDate(
                         initialDate: _dueDate ?? _taskDate,
@@ -347,10 +360,8 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                   Switch(
                     value: _reminderEnabled,
                     activeThumbColor: AppColor.kPrimaryColor,
-                    activeTrackColor:
-                        AppColor.kPrimaryColor.withValues(alpha: 0.45),
-                    onChanged: (value) =>
-                        setState(() => _reminderEnabled = value),
+                    activeTrackColor: AppColor.kPrimaryColor.withValues(alpha: 0.45),
+                    onChanged: (value) => setState(() => _reminderEnabled = value),
                   ),
                 ],
               ),
@@ -382,15 +393,13 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                   elevation: 8,
                   shadowColor: AppColor.kPrimaryColor.withValues(alpha: 0.35),
                   minimumSize: const Size(double.infinity, 48),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
                 child: _saving
                     ? const SizedBox(
                         width: 18,
                         height: 18,
-                        child: CircularProgressIndicator(
-                            strokeWidth: 2, color: Colors.white),
+                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                       )
                     : Text(
                         'Save Task',
@@ -441,8 +450,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
           ),
           filled: true,
           fillColor: Colors.white,
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           border: _inputBorder(),
           enabledBorder: _inputBorder(),
           focusedBorder: _inputBorder(AppColor.kPrimaryColor),
@@ -540,7 +548,8 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                         child: Row(
                           children: [
                             Icon(icon,
-                                size: 18, color: AppColor.kTextStyleColorGray),
+                                size: 18,
+                                color: AppColor.kTextStyleColorGray),
                             const SizedBox(width: 8),
                             Text(item),
                           ],
@@ -578,7 +587,8 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
             child: Row(
               children: [
                 const Icon(TaskIconly.notificationBold,
-                    size: 17, color: AppColor.kTextStyleColorGray),
+                    size: 17,
+                    color: AppColor.kTextStyleColorGray),
                 const SizedBox(width: 9),
                 Expanded(
                   child: Text(
@@ -599,8 +609,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                   ),
                 ),
                 const SizedBox(width: 8),
-                const Icon(TaskIconly.time,
-                    size: 13, color: AppColor.kSecondColor),
+                const Icon(TaskIconly.time, size: 13, color: AppColor.kSecondColor),
               ],
             ),
           ),
@@ -652,8 +661,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                 height: 44,
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.16),
-                  borderRadius:
-                      const BorderRadius.only(topRight: Radius.circular(48)),
+                  borderRadius: const BorderRadius.only(topRight: Radius.circular(48)),
                 ),
               ),
             ),
@@ -661,16 +669,13 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
               left: 118,
               top: 0,
               bottom: 0,
-              child: Container(
-                  width: 8,
-                  color: AppColor.kSecondColor.withValues(alpha: 0.28)),
+              child: Container(width: 8, color: AppColor.kSecondColor.withValues(alpha: 0.28)),
             ),
             Positioned(
               left: 128,
               top: 0,
               bottom: 0,
-              child: Container(
-                  width: 88, color: Colors.white.withValues(alpha: 0.16)),
+              child: Container(width: 88, color: Colors.white.withValues(alpha: 0.16)),
             ),
             Positioned(
               right: 28,
@@ -686,8 +691,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                     bottomLeft: Radius.circular(16),
                     bottomRight: Radius.circular(16),
                   ),
-                  border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.7), width: 2),
+                  border: Border.all(color: Colors.white.withValues(alpha: 0.7), width: 2),
                 ),
               ),
             ),
@@ -698,8 +702,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                 width: 18,
                 height: 26,
                 decoration: BoxDecoration(
-                  border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.82), width: 3),
+                  border: Border.all(color: Colors.white.withValues(alpha: 0.82), width: 3),
                   borderRadius: BorderRadius.circular(18),
                 ),
               ),

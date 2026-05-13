@@ -9,4 +9,5 @@ class AppConfig {
   /// Token key for SharedPreferences
   static const String tokenKey = 'auth_token';
   static const String userKey  = 'cached_user';
+  static const String localAvatarKey = 'cached_local_avatar';
 }

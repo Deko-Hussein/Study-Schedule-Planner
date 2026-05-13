@@ -22,13 +22,14 @@ router.get('/', auth, async (req, res) => {
 // POST /api/tasks
 router.post('/', auth, async (req, res) => {
   try {
-    const { subject, title, description, dueDate, priority } = req.body;
+    const { subject, title, description, category, dueDate, priority } = req.body;
     if (!title) return res.status(400).json({ error: 'Task title is required' });
 
     const task = await Task.create({
       user: req.user._id,
       subject, title,
       description: description || '',
+      category: category || 'Other',
       dueDate: dueDate || null,
       priority: priority || 'medium',
     });

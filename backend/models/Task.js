@@ -5,6 +5,7 @@ const taskSchema = new mongoose.Schema({
   subject:     { type: mongoose.Schema.Types.ObjectId, ref: 'Subject' },
   title:       { type: String, required: true, trim: true },
   description: { type: String, default: '' },
+  category:    { type: String, default: 'Other', trim: true },
   dueDate:     { type: Date },
   priority:    { type: String, enum: ['low', 'medium', 'high'], default: 'medium' },
   completed:   { type: Boolean, default: false },
