@@ -78,7 +78,8 @@ class AuthProvider extends ChangeNotifier {
       _error = e.message;
       return false;
     } catch (e) {
-      _error = 'Connection error. Is the backend running?';
+      _error =
+          'Connection error. Could not reach ${AppConfig.baseUrl}. Start the backend server and make sure MongoDB is available.';
       return false;
     } finally {
       _loading = false;
@@ -99,7 +100,8 @@ class AuthProvider extends ChangeNotifier {
       _error = e.message;
       return false;
     } catch (e) {
-      _error = 'Connection error. Is the backend running?';
+      _error =
+          'Connection error. Could not reach ${AppConfig.baseUrl}. Start the backend server and make sure MongoDB is available.';
       return false;
     } finally {
       _loading = false;
