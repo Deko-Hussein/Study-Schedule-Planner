@@ -6,6 +6,7 @@ import '../services/api_service.dart';
 
 class AuthProvider extends ChangeNotifier {
   Map<String, dynamic>? _user;
+  String? _localAvatar;
   bool _loading = false;
   String? _error;
 
@@ -17,7 +18,7 @@ class AuthProvider extends ChangeNotifier {
   String get userName => _user?['name']?.toString() ?? '';
   String get userEmail => _user?['email']?.toString() ?? '';
   String get userMajor => _user?['major']?.toString() ?? '';
-  String get userAvatar => _user?['avatar']?.toString() ?? '';
+  String get userAvatar => _localAvatar ?? _user?['avatar']?.toString() ?? '';
   String get subscription => _user?['subscription']?.toString() ?? 'free';
   Map<String, dynamic> get notifications =>
       (_user?['notifications'] as Map<String, dynamic>?) ??
@@ -35,6 +36,12 @@ class AuthProvider extends ChangeNotifier {
       notifyListeners();
       // refresh from server silently
       _refreshProfile();
+    }
+
+    final cachedAvatar = prefs.getString(AppConfig.localAvatarKey);
+    if (cachedAvatar != null && cachedAvatar.isNotEmpty) {
+      _localAvatar = cachedAvatar;
+      notifyListeners();
     }
   }
 
@@ -124,6 +131,35 @@ class AuthProvider extends ChangeNotifier {
       _loading = false;
       notifyListeners();
     }
+  }
+
+  Future<void> cacheProfilePatch(Map<String, dynamic> data) async {
+    if (_user == null) {
+      return;
+    }
+
+    _user = {
+      ...?_user,
+      ...data,
+    };
+
+    if (data.containsKey('avatar')) {
+      _localAvatar = data['avatar']?.toString();
+    }
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(AppConfig.userKey, jsonEncode(_user));
+    if (_localAvatar != null && _localAvatar!.isNotEmpty) {
+      await prefs.setString(AppConfig.localAvatarKey, _localAvatar!);
+    }
+    notifyListeners();
+  }
+
+  Future<void> cacheLocalAvatar(String avatar) async {
+    _localAvatar = avatar;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(AppConfig.localAvatarKey, avatar);
+    notifyListeners();
   }
 
   void clearError() {

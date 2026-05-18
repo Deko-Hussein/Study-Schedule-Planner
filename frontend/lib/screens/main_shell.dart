@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconly/iconly.dart';
-import '../utils/color.dart';
-import 'history/history_screen.dart';
-import 'profile/profile_screen.dart';
-import 'tasks/new_task_screen.dart';
+
+import '../utils/exports.dart';
 
 class AppIconly {
   AppIconly._();
@@ -27,12 +25,12 @@ class MainShell extends StatefulWidget {
 }
 
 class _MainShellState extends State<MainShell> {
-  int _index = 2;
+  int _index = 0;
 
   final List<Widget> _pages = const [
-    _PlaceholderTab(title: 'Planner', icon: AppIconly.calendar),
-    NewTaskScreen(),
-    HistoryScreen(),
+    HomeScreen(),
+    AddTaskScreen(),
+    TaskDetailScreen(title: 'Completed Tasks'),
     ProfileScreen(),
   ];
 
@@ -40,7 +38,10 @@ class _MainShellState extends State<MainShell> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColor.kbgColor,
-      body: _pages[_index],
+      body: IndexedStack(
+        index: _index,
+        children: _pages,
+      ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -75,7 +76,7 @@ class _MainShellState extends State<MainShell> {
                 _NavItem(
                   icon: AppIconly.history,
                   activeIcon: AppIconly.historyBold,
-                  label: 'History',
+                  label: 'Done',
                   active: _index == 2,
                   onTap: () => setState(() => _index = 2),
                 ),
@@ -89,36 +90,6 @@ class _MainShellState extends State<MainShell> {
               ],
             ),
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _PlaceholderTab extends StatelessWidget {
-  final String title;
-  final IconData icon;
-
-  const _PlaceholderTab({required this.title, required this.icon});
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 34, color: AppColor.kTextStyleColorGray),
-            const SizedBox(height: 10),
-            Text(
-              title,
-              style: GoogleFonts.inter(
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
-                color: AppColor.kTextStyleColor,
-              ),
-            ),
-          ],
         ),
       ),
     );
@@ -143,6 +114,7 @@ class _NavItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = active ? AppColor.kPrimaryColor : AppColor.kTextStyleColorGray;
+
     return Expanded(
       child: InkWell(
         onTap: onTap,
