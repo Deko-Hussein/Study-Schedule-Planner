@@ -403,7 +403,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             );
                           },
                           child: Text(
-                            'Create account',
+                            'Don\'t have an account? Sign Up',
                             style: TextStyle(
                               color: AppColor.kSecondColor,
                               fontWeight: FontWeight.w600,

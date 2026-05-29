@@ -2,19 +2,20 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../models/schedule_task.dart';
-import '../../services/api_service.dart';
-import '../../utils/color.dart';
 import '../../utils/exports.dart';
 
 class HomeScreen extends StatefulWidget {
   final ValueListenable<int>? refreshListenable;
   final VoidCallback? onTaskChanged;
+  final VoidCallback? onProfileTap;
+  final VoidCallback? onNotificationTap;
 
   const HomeScreen({
     super.key,
     this.refreshListenable,
     this.onTaskChanged,
+    this.onProfileTap,
+    this.onNotificationTap,
   });
 
   @override
@@ -55,11 +56,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   List<ScheduleTask> get filteredTasks {
     return _tasks.where((task) {
-      final matchesCategory =
-          selectedCategory == 0 || task.category == categories[selectedCategory];
+      final matchesCategory = selectedCategory == 0 ||
+          task.category == categories[selectedCategory];
 
-      final matchesFilter =
-          selectedFilter == 0 ||
+      final matchesFilter = selectedFilter == 0 ||
           selectedFilter == 1 && !task.completed ||
           selectedFilter == 2 && task.completed;
 
@@ -161,19 +161,22 @@ class _HomeScreenState extends State<HomeScreen> {
     final completedCount = _tasks.where((task) => task.completed).length;
 
     return Scaffold(
-      backgroundColor: AppColor.kbgColor,
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+          padding: const EdgeInsets.fromLTRB(20, 18, 20, 0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              TopBar(),
-              const SizedBox(height: 24),
+              TopBar(
+                onProfileTap: widget.onProfileTap,
+                onNotificationTap: widget.onNotificationTap,
+              ),
+              const SizedBox(height: 28),
               MonthCard(),
-              const SizedBox(height: 18),
+              const SizedBox(height: 20),
               WeekTimeline(),
-              const SizedBox(height: 24),
+              const SizedBox(height: 28),
               ScheduleHeader(
                 selected: selectedFilter,
                 onChanged: (index) {
@@ -191,7 +194,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   });
                 },
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 28),
               Row(
                 children: [
                   Expanded(
@@ -204,17 +207,27 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                   ),
-                  Text(
-                    '$completedCount/${_tasks.length} done',
-                    style: GoogleFonts.inter(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                      color: AppColor.kPrimaryColor,
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColor.kbgColor,
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Text(
+                      '$completedCount/${_tasks.length} done',
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: AppColor.kPrimaryColor,
+                      ),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 18),
               Expanded(child: _buildTaskBody()),
             ],
           ),
@@ -262,7 +275,9 @@ class _HomeScreenState extends State<HomeScreen> {
     return RefreshIndicator(
       onRefresh: _loadTasks,
       child: ListView.separated(
-        physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+        physics: const AlwaysScrollableScrollPhysics(
+            parent: BouncingScrollPhysics()),
+        padding: const EdgeInsets.only(bottom: 28),
         itemCount: filteredTasks.length,
         separatorBuilder: (_, __) => const SizedBox(height: 14),
         itemBuilder: (context, index) {
@@ -292,25 +307,40 @@ class _StatusMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            message,
-            style: GoogleFonts.inter(
-              color: AppColor.kTextStyleColorGray,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
+        decoration: BoxDecoration(
+          color: AppColor.kbgColor,
+          borderRadius: BorderRadius.circular(24),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              Icons.calendar_today_rounded,
+              color: AppColor.kPrimaryColor,
+              size: 28,
             ),
-          ),
-          if (actionLabel != null) ...[
             const SizedBox(height: 12),
-            TextButton(
-              onPressed: onTap == null ? null : () => onTap!.call(),
-              child: Text(actionLabel!),
+            Text(
+              message,
+              style: GoogleFonts.inter(
+                color: AppColor.kTextStyleColorGray,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+              textAlign: TextAlign.center,
             ),
+            if (actionLabel != null) ...[
+              const SizedBox(height: 14),
+              TextButton(
+                onPressed: onTap == null ? null : () => onTap!.call(),
+                child: Text(actionLabel!),
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }
@@ -321,14 +351,22 @@ class _EmptyMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      'No tasks match this filter.',
-      style: GoogleFonts.inter(
-        color: AppColor.kTextStyleColorGray,
-        fontSize: 14,
-        fontWeight: FontWeight.w500,
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
+      decoration: BoxDecoration(
+        color: AppColor.kbgColor,
+        borderRadius: BorderRadius.circular(24),
       ),
-      textAlign: TextAlign.center,
+      child: Text(
+        'No tasks match this filter.',
+        style: GoogleFonts.inter(
+          color: AppColor.kTextStyleColorGray,
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+        ),
+        textAlign: TextAlign.center,
+      ),
     );
   }
 }

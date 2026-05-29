@@ -30,12 +30,15 @@ class AuthProvider extends ChangeNotifier {
 
   Future<void> _loadCached() async {
     final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString(AppConfig.tokenKey);
     final cached = prefs.getString(AppConfig.userKey);
-    if (cached != null) {
+    if (token != null && cached != null) {
       _user = jsonDecode(cached) as Map<String, dynamic>;
       notifyListeners();
       // refresh from server silently
-      _refreshProfile();
+      await _refreshProfile();
+    } else if (token == null && cached != null) {
+      await prefs.remove(AppConfig.userKey);
     }
 
     final cachedAvatar = prefs.getString(AppConfig.localAvatarKey);
@@ -48,11 +51,15 @@ class AuthProvider extends ChangeNotifier {
   Future<void> _refreshProfile() async {
     try {
       final data = await ApiService.getMe();
-      _cacheUser(data['user'] as Map<String, dynamic>);
+      await _cacheUser(data['user'] as Map<String, dynamic>);
+    } on ApiException catch (e) {
+      if (e.statusCode == 401) {
+        await logout();
+      }
     } catch (_) {}
   }
 
-  void _cacheUser(Map<String, dynamic> user) async {
+  Future<void> _cacheUser(Map<String, dynamic> user) async {
     _user = user;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(AppConfig.userKey, jsonEncode(user));
@@ -72,7 +79,7 @@ class AuthProvider extends ChangeNotifier {
       final data = await ApiService.register(
           name: name, email: email, password: password, major: major);
       await ApiService.saveToken(data['token'] as String);
-      _cacheUser(data['user'] as Map<String, dynamic>);
+      await _cacheUser(data['user'] as Map<String, dynamic>);
       return true;
     } on ApiException catch (e) {
       _error = e.message;
@@ -94,7 +101,7 @@ class AuthProvider extends ChangeNotifier {
     try {
       final data = await ApiService.login(email: email, password: password);
       await ApiService.saveToken(data['token'] as String);
-      _cacheUser(data['user'] as Map<String, dynamic>);
+      await _cacheUser(data['user'] as Map<String, dynamic>);
       return true;
     } on ApiException catch (e) {
       _error = e.message;
@@ -112,6 +119,10 @@ class AuthProvider extends ChangeNotifier {
   Future<void> logout() async {
     await ApiService.clearToken();
     _user = null;
+    _localAvatar = null;
+    _error = null;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(AppConfig.localAvatarKey);
     notifyListeners();
   }
 

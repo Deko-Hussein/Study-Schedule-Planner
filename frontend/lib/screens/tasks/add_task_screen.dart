@@ -23,10 +23,12 @@ class TaskIconly {
 
 class AddTaskScreen extends StatefulWidget {
   final VoidCallback? onTaskSaved;
+  final VoidCallback? onProfileTap;
 
   const AddTaskScreen({
     super.key,
     this.onTaskSaved,
+    this.onProfileTap,
   });
 
   @override
@@ -216,18 +218,26 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
 
   Widget _appHeader() => Row(
         children: [
-          Container(
-            width: 38,
-            height: 38,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-              border: Border.all(color: AppColor.borderPrimary),
-            ),
-            child: const Icon(
-              TaskIconly.profileBold,
-              size: 18,
-              color: AppColor.kPrimaryColor,
+          Material(
+            color: Colors.transparent,
+            shape: const CircleBorder(),
+            child: InkWell(
+              onTap: widget.onProfileTap,
+              customBorder: const CircleBorder(),
+              child: Container(
+                width: 38,
+                height: 38,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: AppColor.borderPrimary),
+                ),
+                child: const Icon(
+                  TaskIconly.profileBold,
+                  size: 18,
+                  color: AppColor.kPrimaryColor,
+                ),
+              ),
             ),
           ),
           const SizedBox(width: 10),

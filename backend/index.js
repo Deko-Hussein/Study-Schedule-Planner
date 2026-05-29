@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const crypto = require('crypto');
 const tls = require('tls');
+const { isLocalDataMode, localDataFallbackEnabled, setLocalDataMode } = require('./lib/dataMode');
 require('dotenv').config();
 
 const app = express();
@@ -29,6 +30,8 @@ let serverStarted = false;
 let mongoConfigErrorLogged = false;
 let lastMongoError = null;
 let lastMongoErrorSignature = null;
+let mongoDisconnectedLogged = false;
+let localDataModeLogged = false;
 let reconnectAttempts = 0;
 
 app.use(cors());
@@ -119,6 +122,7 @@ function classifyMongoError(err) {
   }
 
   if (
+    normalized.includes('querysrv etimeout') ||
     normalized.includes('querysrv enotfound') ||
     normalized.includes('enotfound') ||
     normalized.includes('getaddrinfo')
@@ -126,7 +130,7 @@ function classifyMongoError(err) {
     return {
       category: 'dns',
       summary:
-        'The Atlas hostname could not be resolved. Check your internet connection, DNS settings, VPN, or whether your network blocks SRV lookups.',
+        'The Atlas SRV DNS lookup timed out or could not be resolved. Check your internet connection, DNS settings, VPN, or whether your network blocks SRV lookups.',
       code,
     };
   }
@@ -184,6 +188,15 @@ function rememberMongoError(err) {
     hints.push('Recheck the Atlas database username and password in backend/.env.');
   }
 
+  if (details.category === 'dns') {
+    hints.push('Try a different network such as a phone hotspot to rule out local DNS filtering.');
+    hints.push('If your DNS blocks SRV lookups, use the non-SRV Atlas connection string format in backend/.env.');
+  }
+
+  if (localDataFallbackEnabled) {
+    hints.push('Local fallback mode is available, so the app can keep working with data stored in backend/.local-data.json.');
+  }
+
   lastMongoError = {
     ...details,
     hints,
@@ -210,6 +223,10 @@ function logMongoError(err) {
 }
 
 function getDatabaseUnavailableMessage() {
+  if (isLocalDataMode()) {
+    return null;
+  }
+
   const configError = getMongoConfigError();
   if (configError) {
     return configError;
@@ -222,6 +239,9 @@ mongoose.connection.on('connected', () => {
   mongoConnectPromise = null;
   lastMongoError = null;
   lastMongoErrorSignature = null;
+  mongoDisconnectedLogged = false;
+  localDataModeLogged = false;
+  setLocalDataMode(false);
   reconnectAttempts = 0;
   if (reconnectTimer) {
     clearTimeout(reconnectTimer);
@@ -235,24 +255,34 @@ mongoose.connection.on('error', (err) => {
 });
 
 mongoose.connection.on('disconnected', () => {
-  if (mongoose.connection.readyState !== 0 || reconnectAttempts > 0) {
+  if (!mongoDisconnectedLogged && (mongoose.connection.readyState !== 0 || reconnectAttempts > 0)) {
     console.warn('MongoDB connection disconnected');
+    mongoDisconnectedLogged = true;
   }
   mongoConnectPromise = null;
+
+  if (localDataFallbackEnabled) {
+    setLocalDataMode(true);
+  }
+
   scheduleReconnect();
 });
 
 app.get('/', (req, res) => res.json({ status: 'Study Planner API running' }));
 app.get('/api/health', (req, res) => {
   const dbConnected = mongoose.connection.readyState === 1;
+  const localMode = isLocalDataMode();
   const configError = getMongoConfigError();
-  res.status(dbConnected ? 200 : 503).json({
-    status: dbConnected ? 'ok' : 'degraded',
-    database: dbConnected ? 'connected' : 'disconnected',
-    error: dbConnected ? null : configError || lastMongoError?.summary || null,
-    details: dbConnected
+  const serviceAvailable = dbConnected || localMode;
+
+  res.status(serviceAvailable ? 200 : 503).json({
+    status: dbConnected ? 'ok' : localMode ? 'fallback' : 'degraded',
+    database: dbConnected ? 'connected' : localMode ? 'local-fallback' : 'disconnected',
+    error: serviceAvailable ? null : configError || lastMongoError?.summary || null,
+    details: dbConnected && !localMode
       ? null
       : {
+          mode: localMode ? 'local-fallback' : 'mongo-only',
           category: lastMongoError?.category || (configError ? 'configuration' : 'unknown'),
           code: lastMongoError?.code || (configError ? 'MONGO_CONFIG_ERROR' : null),
           at: lastMongoError?.at || null,
@@ -267,7 +297,7 @@ app.use((req, res, next) => {
     return next();
   }
 
-  if (mongoose.connection.readyState !== 1) {
+  if (mongoose.connection.readyState !== 1 && !isLocalDataMode()) {
     return res.status(503).json({
       error: getDatabaseUnavailableMessage(),
     });
@@ -312,6 +342,15 @@ async function connectToMongo() {
       console.error(`MongoDB configuration error: ${configError}`);
       mongoConfigErrorLogged = true;
     }
+
+    if (localDataFallbackEnabled) {
+      setLocalDataMode(true);
+      if (!localDataModeLogged) {
+        console.warn('Local fallback mode enabled because MongoDB is not configured.');
+        localDataModeLogged = true;
+      }
+    }
+
     return;
   }
 
@@ -330,6 +369,13 @@ async function connectToMongo() {
   } catch (err) {
     logMongoError(err);
     mongoConnectPromise = null;
+    if (localDataFallbackEnabled) {
+      setLocalDataMode(true);
+      if (!localDataModeLogged) {
+        console.warn('Local fallback mode enabled. Data will be stored in backend/.local-data.json until MongoDB reconnects.');
+        localDataModeLogged = true;
+      }
+    }
     scheduleReconnect();
   }
 }
