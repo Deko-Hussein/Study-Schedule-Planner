@@ -6,9 +6,17 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/auth_provider.dart';
+import '../screens/tasks/notification_screen.dart';
 
 class TopBar extends StatelessWidget {
-  const TopBar({super.key});
+  final VoidCallback? onProfileTap;
+  final VoidCallback? onNotificationTap;
+
+  const TopBar({
+    super.key,
+    this.onProfileTap,
+    this.onNotificationTap,
+  });
 
   ImageProvider<Object>? _avatarImageProvider(String avatar) {
     if (avatar.isEmpty) {
@@ -42,30 +50,38 @@ class TopBar extends StatelessWidget {
 
     return Row(
       children: [
-        Container(
-          width: 48,
-          height: 48,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.08),
-                blurRadius: 16,
-                offset: const Offset(0, 10),
+        Material(
+          color: Colors.transparent,
+          shape: const CircleBorder(),
+          child: InkWell(
+            onTap: onProfileTap,
+            customBorder: const CircleBorder(),
+            child: Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.08),
+                    blurRadius: 16,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
               ),
-            ],
-          ),
-          child: CircleAvatar(
-            backgroundColor: Colors.white,
-            backgroundImage: avatarImage,
-            child: avatarImage == null
-                ? const Icon(
-                    Icons.person_outline_rounded,
-                    color: AppColor.kPrimaryColor,
-                    size: 26,
-                  )
-                : null,
+              child: CircleAvatar(
+                backgroundColor: Colors.white,
+                backgroundImage: avatarImage,
+                child: avatarImage == null
+                    ? const Icon(
+                        Icons.person_outline_rounded,
+                        color: AppColor.kPrimaryColor,
+                        size: 26,
+                      )
+                    : null,
+              ),
+            ),
           ),
         ),
 
@@ -104,14 +120,21 @@ class TopBar extends StatelessWidget {
             borderRadius: BorderRadius.circular(14),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.08),
+                color: Colors.black.withOpacity(0.08),
                 blurRadius: 16,
                 offset: const Offset(0, 10),
               ),
             ],
           ),
           child: IconButton(
-            onPressed: () {},
+            onPressed: onNotificationTap ??
+                () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const NotificationScreen(),
+                    ),
+                  );
+                },
             icon: const Icon(
               Icons.notifications_none_rounded,
               color: AppColor.kPrimaryColor,

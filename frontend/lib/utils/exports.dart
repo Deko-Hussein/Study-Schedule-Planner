@@ -1,5 +1,4 @@
 // Central exports for the Study Schedule Planner app.
-
 // Utilities
 export 'color.dart';
 export 'sizes.dart';
@@ -27,6 +26,7 @@ export '../screens/auth/register_screen.dart';
 export '../screens/hom/home_screen.dart';
 
 export '../screens/tasks/add_task_screen.dart';
+export '../screens/tasks/notification_screen.dart';
 export '../screens/tasks/task_detail_screen.dart';
 
 export '../screens/profile/profile_screen.dart';
