@@ -14,7 +14,15 @@ class CategoryChips extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final categories = ['All', 'Study', 'Assignment', 'Exam', 'Reading'];
+    final categories = [
+      'All',
+      'Study',
+      'Assignment',
+      'Exam',
+      'Reading',
+      'Personal',
+      'Other',
+    ];
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -22,21 +30,29 @@ class CategoryChips extends StatelessWidget {
       child: Row(
         children: List.generate(categories.length, (index) {
           final isActive = selected == index;
+
           return GestureDetector(
             onTap: () => onChanged(index),
             child: Container(
-              margin: EdgeInsets.only(right: index == categories.length - 1 ? 0 : 12),
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+              margin: EdgeInsets.only(
+                right: index == categories.length - 1 ? 0 : 12,
+              ),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 18,
+                vertical: 12,
+              ),
               decoration: BoxDecoration(
                 color: isActive ? AppColor.kPrimaryColor : Colors.white,
                 borderRadius: BorderRadius.circular(18),
                 border: Border.all(
-                  color: isActive ? Colors.transparent : AppColor.borderSecondary,
+                  color: isActive
+                      ? AppColor.kPrimaryColor
+                      : AppColor.borderSecondary,
                 ),
                 boxShadow: isActive
                     ? [
                         BoxShadow(
-                          color: AppColor.kPrimaryColor.withOpacity(0.12),
+                          color: AppColor.kPrimaryColor.withValues(alpha: 0.16),
                           blurRadius: 16,
                           offset: const Offset(0, 8),
                         ),
@@ -48,7 +64,9 @@ class CategoryChips extends StatelessWidget {
                 style: GoogleFonts.inter(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
-                  color: isActive ? Colors.white : AppColor.kTextStyleColorGray,
+                  color: isActive
+                      ? Colors.white
+                      : AppColor.kTextStyleColorGray,
                 ),
               ),
             ),

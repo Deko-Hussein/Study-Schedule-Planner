@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/utils/color.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../utils/color.dart';
 
 class ScheduleHeader extends StatelessWidget {
   final int selected;
-  final ValueChanged<int> onChanged;
+  final Function(int) onChanged;
 
   const ScheduleHeader({
     super.key,
@@ -14,56 +14,38 @@ class ScheduleHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final filters = ['All', 'Pending', 'Completed'];
+    final options = ['All', 'Pending', 'Completed'];
 
     return Row(
-      children: [
-        Expanded(
-          child: Text(
-            'My Schedule',
-            style: GoogleFonts.inter(
-              fontSize: 22,
-              fontWeight: FontWeight.w800,
-              color: AppColor.kSecondColor,
-            ),
-          ),
-        ),
-        Row(
-          children: List.generate(filters.length, (index) {
-            final isActive = selected == index;
-
-            return GestureDetector(
-              onTap: () => onChanged(index),
-              child: Container(
-                margin: const EdgeInsets.only(left: 8),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: isActive ? AppColor.kPrimaryColor : Colors.white,
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
-                    color: isActive
-                        ? AppColor.kPrimaryColor
-                        : AppColor.borderSecondary,
-                  ),
-                ),
-                child: Text(
-                  filters[index],
-                  style: GoogleFonts.inter(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
-                    color: isActive
-                        ? Colors.white
-                        : AppColor.kTextStyleColorGray,
+      children: List.generate(options.length, (index) {
+        final isActive = index == selected;
+        return Expanded(
+          child: GestureDetector(
+            onTap: () => onChanged(index),
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              decoration: BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
+                    color: isActive ? AppColor.kPrimaryColor : Colors.transparent,
+                    width: 2,
                   ),
                 ),
               ),
-            );
-          }),
-        ),
-      ],
+              child: Center(
+                child: Text(
+                  options[index],
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: isActive ? AppColor.kPrimaryColor : AppColor.kTextStyleColorGray,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      }),
     );
   }
 }

@@ -1,19 +1,15 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:frontend/providers/auth_provider.dart';
 import 'package:frontend/utils/color.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-class TopBar extends StatefulWidget {
+import '../providers/auth_provider.dart';
+
+class TopBar extends StatelessWidget {
   const TopBar({super.key});
 
-  @override
-  State<TopBar> createState() => _TopBarState();
-}
-
-class _TopBarState extends State<TopBar> {
   ImageProvider<Object>? _avatarImageProvider(String avatar) {
     if (avatar.isEmpty) {
       return null;
@@ -54,22 +50,27 @@ class _TopBarState extends State<TopBar> {
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.08),
+                color: Colors.black.withValues(alpha: 0.08),
                 blurRadius: 16,
                 offset: const Offset(0, 10),
               ),
             ],
           ),
           child: CircleAvatar(
-            radius: 24,
-            backgroundColor: Colors.transparent,
+            backgroundColor: Colors.white,
             backgroundImage: avatarImage,
             child: avatarImage == null
-                ? const Icon(Icons.person_outline, color: Color(0xFF2563EB), size: 24)
+                ? const Icon(
+                    Icons.person_outline_rounded,
+                    color: AppColor.kPrimaryColor,
+                    size: 26,
+                  )
                 : null,
           ),
         ),
+
         const SizedBox(width: 12),
+
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -94,6 +95,7 @@ class _TopBarState extends State<TopBar> {
             ],
           ),
         ),
+
         Container(
           width: 44,
           height: 44,
@@ -102,7 +104,7 @@ class _TopBarState extends State<TopBar> {
             borderRadius: BorderRadius.circular(14),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.08),
+                color: Colors.black.withValues(alpha: 0.08),
                 blurRadius: 16,
                 offset: const Offset(0, 10),
               ),
@@ -110,8 +112,11 @@ class _TopBarState extends State<TopBar> {
           ),
           child: IconButton(
             onPressed: () {},
-            icon: const Icon(Icons.notifications_none, color: Color(0xFF2563EB)),
-            splashRadius: 24,
+            icon: const Icon(
+              Icons.notifications_none_rounded,
+              color: AppColor.kPrimaryColor,
+            ),
+            splashRadius: 22,
           ),
         ),
       ],

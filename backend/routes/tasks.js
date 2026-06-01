@@ -45,7 +45,7 @@ router.get("/", auth, async (req, res) => {
 
 router.post("/", auth, async (req, res) => {
   try {
-    const { subject, title, description, dueDate, priority } = req.body;
+    const { subject, title, description, category, dueDate, priority } = req.body;
 
     if (!title) {
       return res.status(400).json({ error: "Task title is required" });
@@ -57,6 +57,7 @@ router.post("/", auth, async (req, res) => {
           subject,
           title,
           description: description || "",
+          category: category || "Other",
           dueDate: dueDate || null,
           priority: priority || "medium",
         })
@@ -64,6 +65,7 @@ router.post("/", auth, async (req, res) => {
           subject,
           title,
           description,
+          category,
           dueDate,
           priority,
         });

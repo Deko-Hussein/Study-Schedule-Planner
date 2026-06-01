@@ -384,6 +384,7 @@ const createTask = (userId, data) =>
       subject: data.subject || null,
       title: String(data.title).trim(),
       description: data.description || "",
+      category: data.category || "Other",
       dueDate: data.dueDate || null,
       priority: data.priority || "medium",
       completed: false,
