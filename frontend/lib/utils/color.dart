@@ -4,12 +4,12 @@ class AppColor {
   AppColor._();
 
   // Background Colors
-  static const Color kbgColor  = Color(0xFFF0F4F8);   // soft blue-gray background
+  static const Color kbgColor  = Color(0xFFF0F4F8); 
   static const Color kbgColor2 = Color(0xFFFFFFFF);
 
   // Primary Brand Colors  (blue to match screenshots)
-  static const Color kPrimaryColor  = Color(0xFF2563EB);  // bright blue
-  static const Color kSecondColor   = Color(0xFF0F172A);  // dark navy
+  static const Color kPrimaryColor  = Color(0xFF2563EB);  
+  static const Color kSecondColor   = Color(0xFF0F172A);  
 
   // Text Colors
   static const Color kTextStyleColor     = Color(0xFF1E293B);

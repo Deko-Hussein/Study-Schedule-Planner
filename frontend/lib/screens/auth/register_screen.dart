@@ -52,11 +52,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
       suffixIcon: suffixIcon,
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(28),
-        borderSide: BorderSide(color: Colors.transparent),
+        borderSide: const BorderSide(color: Colors.transparent),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(28),
-        borderSide: BorderSide(color: AppColor.kPrimaryColor.withOpacity(0.35)),
+        borderSide: BorderSide(color: AppColor.kPrimaryColor.withValues(alpha: 0.35)),
       ),
       contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 18),
       errorMaxLines: 2,
@@ -183,7 +183,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     borderRadius: BorderRadius.circular(32),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColor.kPrimaryColor.withOpacity(0.22),
+                        color: AppColor.kPrimaryColor.withValues(alpha: 0.22),
                         blurRadius: 24,
                         offset: const Offset(0, 10),
                       ),
@@ -225,7 +225,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     borderRadius: BorderRadius.circular(32),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.04),
+                        color: Colors.black.withValues(alpha: 0.04),
                         blurRadius: 24,
                         offset: const Offset(0, 10),
                       ),

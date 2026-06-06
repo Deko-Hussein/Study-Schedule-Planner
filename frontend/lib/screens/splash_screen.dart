@@ -4,8 +4,8 @@ import 'package:provider/provider.dart';
 
 import '../providers/auth_provider.dart';
 import '../utils/color.dart';
-import 'main_shell.dart';
 import 'auth/login_screen.dart';
+import 'main_shell.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -77,7 +77,7 @@ class _SplashScreenState extends State<SplashScreen>
                     borderRadius: BorderRadius.circular(24),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColor.kPrimaryColor.withOpacity(0.12),
+                        color: AppColor.kPrimaryColor.withValues(alpha: 0.12),
                         blurRadius: 24,
                         offset: const Offset(0, 8),
                       ),

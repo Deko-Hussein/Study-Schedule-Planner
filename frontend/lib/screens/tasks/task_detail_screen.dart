@@ -46,7 +46,7 @@ class TaskDetailScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(26),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 20,
                   offset: const Offset(0, 12),
                 ),
@@ -59,7 +59,7 @@ class TaskDetailScreen extends StatelessWidget {
                   width: 58,
                   height: 58,
                   decoration: BoxDecoration(
-                    color: AppColor.kPrimaryColor.withOpacity(0.12),
+                    color: AppColor.kPrimaryColor.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(18),
                   ),
                   child: const Icon(
