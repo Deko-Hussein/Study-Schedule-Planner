@@ -56,9 +56,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(28),
+<<<<<<< HEAD
         borderSide: BorderSide(
           color: AppColor.kPrimaryColor.withValues(alpha: 0.35),
         ),
+=======
+        borderSide: BorderSide(color: AppColor.kPrimaryColor.withValues(alpha: 0.35)),
+>>>>>>> 32bc85c5f392e098a181db65d1e8fda72c5e3890
       ),
       contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 18),
       errorMaxLines: 2,
@@ -177,6 +181,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 28),
             child: Column(
               children: [
+<<<<<<< HEAD
                 StudyPlannerLogoBadge(
                   size: 110,
                   backgroundColor: AppColor.kPrimaryColor,
@@ -188,6 +193,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       offset: const Offset(0, 10),
                     ),
                   ],
+=======
+                Container(
+                  width: 110,
+                  height: 110,
+                  decoration: BoxDecoration(
+                    color: AppColor.kPrimaryColor,
+                    borderRadius: BorderRadius.circular(32),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColor.kPrimaryColor.withValues(alpha: 0.22),
+                        blurRadius: 24,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.school,
+                    color: Colors.white,
+                    size: 48,
+                  ),
+>>>>>>> 32bc85c5f392e098a181db65d1e8fda72c5e3890
                 ),
                 const SizedBox(height: 24),
                 Text(

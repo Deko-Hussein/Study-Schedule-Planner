@@ -1,22 +1,74 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
+const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
 
-const userSchema = new mongoose.Schema({
-  name:         { type: String, required: true, trim: true },
-  email:        { type: String, required: true, unique: true, lowercase: true, trim: true },
-  password:     { type: String, required: true, minlength: 6 },
-  major:        { type: String, default: '' },
-  avatar:       { type: String, default: '' },
-  subscription: { type: String, enum: ['free', 'premium'], default: 'free' },
-  notifications: {
-    reminderTime: { type: String, default: '15 Mins' },
-    alertSound:   { type: String, default: 'Classic Chime' },
+const userSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+    },
+
+    password: {
+      type: String,
+      required: true,
+      minlength: 6,
+      select: false,
+    },
+
+    major: {
+      type: String,
+      default: "",
+    },
+
+    avatar: {
+      type: String,
+      default: "",
+    },
+
+    subscription: {
+      type: String,
+      enum: ["free", "premium"],
+      default: "free",
+    },
+
+    role: {
+      type: String,
+      enum: ["student", "admin"],
+      default: "student",
+    },
+
+    status: {
+      type: String,
+      enum: ["active", "blocked"],
+      default: "active",
+    },
+
+    notifications: {
+      reminderTime: {
+        type: String,
+        default: "15 Mins",
+      },
+      alertSound: {
+        type: String,
+        default: "Classic Chime",
+      },
+    },
   },
-}, { timestamps: true });
+  { timestamps: true }
+);
 
-// Hash password before save
-userSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) return next();
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+
   this.password = await bcrypt.hash(this.password, 10);
   next();
 });
@@ -25,11 +77,10 @@ userSchema.methods.comparePassword = function (plain) {
   return bcrypt.compare(plain, this.password);
 };
 
-// Never expose password
 userSchema.methods.toJSON = function () {
   const obj = this.toObject();
   delete obj.password;
   return obj;
 };
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.models.User || mongoose.model("User", userSchema);

@@ -5,8 +5,8 @@ import 'package:provider/provider.dart';
 import '../components/study_planner_logo.dart';
 import '../providers/auth_provider.dart';
 import '../utils/color.dart';
-import 'main_shell.dart';
 import 'auth/login_screen.dart';
+import 'main_shell.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -70,6 +70,7 @@ class _SplashScreenState extends State<SplashScreen>
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+<<<<<<< HEAD
                 StudyPlannerLogoBadge(
                   size: 88,
                   backgroundColor: Colors.white,
@@ -79,6 +80,27 @@ class _SplashScreenState extends State<SplashScreen>
                       color: AppColor.kPrimaryColor.withValues(alpha: 0.12),
                       blurRadius: 24,
                       offset: const Offset(0, 8),
+=======
+                Container(
+                  width: 88,
+                  height: 88,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(24),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColor.kPrimaryColor.withValues(alpha: 0.12),
+                        blurRadius: 24,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  child: const Center(
+                    child: Icon(
+                      Icons.school_rounded,
+                      size: 44,
+                      color: AppColor.kPrimaryColor,
+>>>>>>> 32bc85c5f392e098a181db65d1e8fda72c5e3890
                     ),
                   ],
                 ),

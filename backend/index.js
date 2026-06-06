@@ -23,6 +23,7 @@ const MAX_RECONNECT_ATTEMPTS =
   Number(process.env.MONGO_MAX_RECONNECT_ATTEMPTS) > 0
     ? Number(process.env.MONGO_MAX_RECONNECT_ATTEMPTS)
     : Infinity;
+const adminRoutes = require("./routes/admin");
 
 let mongoConnectPromise = null;
 let reconnectTimer = null;
@@ -307,11 +308,13 @@ app.use((req, res, next) => {
 });
 
 app.use('/api/auth', require('./routes/auth'));
+app.use("/api/admin-auth", require("./routes/adminAuth"));
 app.use('/api/users', require('./routes/users'));
 app.use('/api/subjects', require('./routes/subjects'));
 app.use('/api/schedules', require('./routes/schedules'));
 app.use('/api/reminders', require('./routes/reminders'));
 app.use('/api/tasks', require('./routes/tasks'));
+app.use("/api/admin", adminRoutes);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
