@@ -40,6 +40,18 @@ const userSchema = new mongoose.Schema(
       default: "free",
     },
 
+    role: {
+      type: String,
+      enum: ["student", "admin"],
+      default: "student",
+    },
+
+    status: {
+      type: String,
+      enum: ["active", "blocked"],
+      default: "active",
+    },
+
     notifications: {
       reminderTime: {
         type: String,
