@@ -46,12 +46,12 @@ router.post('/login', async (req, res) => {
     const user = isLocalDataMode()
       ? await localStore.findUserByEmail(email, { includePassword: true })
       : await User.findOne({ email }).select('+password');
-    if (!user) return res.status(401).json({ error: 'Invalid credentials' });
+    if (!user) return res.status(401).json({ error: 'No account found with this email address.' });
 
     const match = isLocalDataMode()
       ? await localStore.comparePassword(user._id, password)
       : await user.comparePassword(password);
-    if (!match) return res.status(401).json({ error: 'Invalid credentials' });
+    if (!match) return res.status(401).json({ error: 'No account found with this email address.' });
 
     const token = signToken(user._id);
     res.json({

@@ -406,7 +406,7 @@ class _HeroCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
-            color: AppColor.kPrimaryColor.withOpacity(0.22),
+            color: AppColor.kPrimaryColor.withValues(alpha: 0.22),
             blurRadius: 28,
             offset: const Offset(0, 14),
           ),
@@ -421,7 +421,7 @@ class _HeroCard extends StatelessWidget {
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.14),
+                  color: Colors.white.withValues(alpha: 0.14),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: const Icon(
@@ -459,7 +459,7 @@ class _HeroCard extends StatelessWidget {
               fontSize: 13,
               height: 1.5,
               fontWeight: FontWeight.w500,
-              color: Colors.white.withOpacity(0.84),
+              color: Colors.white.withValues(alpha: 0.84),
             ),
           ),
           const SizedBox(height: 18),
@@ -500,9 +500,9 @@ class _HeroStat extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.10),
+        color: Colors.white.withValues(alpha: 0.10),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: Colors.white.withOpacity(0.12)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -559,7 +559,7 @@ class _SettingsCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 18,
             offset: const Offset(0, 8),
           ),
@@ -678,7 +678,7 @@ class _SettingsCard extends StatelessWidget {
                 ),
                 decoration: BoxDecoration(
                   color: active
-                      ? AppColor.kPrimaryColor.withOpacity(0.06)
+                      ? AppColor.kPrimaryColor.withValues(alpha: 0.06)
                       : AppColor.kbgColor,
                   borderRadius: BorderRadius.circular(14),
                 ),
@@ -745,7 +745,7 @@ class _NotificationSection extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 18,
             offset: const Offset(0, 8),
           ),
@@ -807,7 +807,7 @@ class _CompletedSection extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 18,
             offset: const Offset(0, 8),
           ),
@@ -885,7 +885,7 @@ class _TaskNotificationTile extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: scheme.accent.withOpacity(0.14),
+              color: scheme.accent.withValues(alpha: 0.14),
               borderRadius: BorderRadius.circular(14),
             ),
             child: Icon(

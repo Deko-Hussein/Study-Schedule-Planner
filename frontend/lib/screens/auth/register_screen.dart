@@ -52,11 +52,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
       suffixIcon: suffixIcon,
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(28),
-        borderSide: BorderSide(color: Colors.transparent),
+        borderSide: const BorderSide(color: Colors.transparent),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(28),
-        borderSide: BorderSide(color: AppColor.kPrimaryColor.withOpacity(0.35)),
+        borderSide: BorderSide(
+          color: AppColor.kPrimaryColor.withValues(alpha: 0.35),
+        ),
       ),
       contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 18),
       errorMaxLines: 2,
@@ -175,25 +177,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 28),
             child: Column(
               children: [
-                Container(
-                  width: 110,
-                  height: 110,
-                  decoration: BoxDecoration(
-                    color: AppColor.kPrimaryColor,
-                    borderRadius: BorderRadius.circular(32),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColor.kPrimaryColor.withOpacity(0.22),
-                        blurRadius: 24,
-                        offset: const Offset(0, 10),
-                      ),
-                    ],
-                  ),
-                  child: const Icon(
-                    Icons.school,
-                    color: Colors.white,
-                    size: 48,
-                  ),
+                StudyPlannerLogoBadge(
+                  size: 110,
+                  backgroundColor: AppColor.kPrimaryColor,
+                  borderRadius: 32,
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColor.kPrimaryColor.withValues(alpha: 0.22),
+                      blurRadius: 24,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 24),
                 Text(
@@ -225,7 +219,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     borderRadius: BorderRadius.circular(32),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.04),
+                        color: Colors.black.withValues(alpha: 0.04),
                         blurRadius: 24,
                         offset: const Offset(0, 10),
                       ),
@@ -256,7 +250,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         autofillHints: const [AutofillHints.name],
                         validator: _validateName,
                         decoration: _buildInputDecoration(
-                          hintText: 'Alex Johnson',
+                          hintText: 'Farax Ali',
                           icon: Icons.person_outline,
                         ),
                       ),
@@ -279,7 +273,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         autofillHints: const [AutofillHints.username, AutofillHints.email],
                         validator: _validateEmail,
                         decoration: _buildInputDecoration(
-                          hintText: 'alex@university.edu',
+                          hintText: 'farax@gmail.com',
                           icon: Icons.email_outlined,
                         ),
                       ),
@@ -417,7 +411,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
           ),
         ),
-      ),
+      )
     );
   }
 }

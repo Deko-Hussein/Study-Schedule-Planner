@@ -251,10 +251,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 ),
               );
             },
-            icon: Badge(
+            icon: const Badge(
               smallSize: 6,
               backgroundColor: AppColor.kCheckOutActiveTextColor,
-              child: const Icon(
+              child: Icon(
                 IconlyLight.notification,
                 size: 24,
                 color: AppColor.kPrimaryColor,

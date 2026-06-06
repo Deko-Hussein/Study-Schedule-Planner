@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
+import '../components/study_planner_logo.dart';
 import '../providers/auth_provider.dart';
 import '../utils/color.dart';
 import 'main_shell.dart';
@@ -69,27 +70,17 @@ class _SplashScreenState extends State<SplashScreen>
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Container(
-                  width: 88,
-                  height: 88,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(24),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColor.kPrimaryColor.withOpacity(0.12),
-                        blurRadius: 24,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
-                  ),
-                  child: const Center(
-                    child: Icon(
-                      Icons.school_rounded,
-                      size: 44,
-                      color: AppColor.kPrimaryColor,
+                StudyPlannerLogoBadge(
+                  size: 88,
+                  backgroundColor: Colors.white,
+                  borderRadius: 24,
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColor.kPrimaryColor.withValues(alpha: 0.12),
+                      blurRadius: 24,
+                      offset: const Offset(0, 8),
                     ),
-                  ),
+                  ],
                 ),
                 const SizedBox(height: 32),
                 Text(

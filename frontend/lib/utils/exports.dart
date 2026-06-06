@@ -39,3 +39,4 @@ export '../components/task_card.dart';
 export '../components/top_bar.dart';
 export '../components/week_timeline.dart';
 export '../components/monthly_calendar.dart';
+export '../components/study_planner_logo.dart';

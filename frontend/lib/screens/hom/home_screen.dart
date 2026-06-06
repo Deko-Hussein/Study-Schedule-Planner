@@ -173,9 +173,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 onNotificationTap: widget.onNotificationTap,
               ),
               const SizedBox(height: 28),
-              MonthCard(),
+              const MonthCard(),
               const SizedBox(height: 20),
-              WeekTimeline(),
+              const WeekTimeline(),
               const SizedBox(height: 28),
               ScheduleHeader(
                 selected: selectedFilter,
@@ -244,7 +244,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     if (_authRequired) {
-      return _StatusMessage(
+      return const _StatusMessage(
         message: 'Log in to see your saved tasks.',
         actionLabel: null,
         onTap: null,

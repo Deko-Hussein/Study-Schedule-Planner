@@ -8,10 +8,8 @@ import 'history/history_screen.dart';
 import 'profile/profile_screen.dart';
 import 'tasks/add_task_screen.dart';
 import 'tasks/notification_screen.dart';
-
 class AppIconly {
   AppIconly._();
-
   static const IconData calendar = IconlyLight.calendar;
   static const IconData calendarBold = IconlyBold.calendar;
 
@@ -97,7 +95,7 @@ class _MainShellState extends State<MainShell> {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.06),
+              color: Colors.black.withValues(alpha: 0.06),
               blurRadius: 16,
               offset: const Offset(0, -2),
             ),

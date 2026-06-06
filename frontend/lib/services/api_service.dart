@@ -1,14 +1,21 @@
 import 'dart:convert';
+
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../config/app_config.dart';
 
-/// Wraps every API call: attaches Bearer token, decodes JSON,
-/// and throws descriptive errors instead of crashing.
+/// Wraps API calls between Flutter and the backend.
+///
+/// Auth flow:
+/// 1. Take email and password from the UI.
+/// 2. Send them to `/auth/login`.
+/// 3. Let the backend validate the account.
+/// 4. Return the `token` and `user` payload to the caller.
 class ApiService {
   ApiService._();
 
-  // ── Token helpers ──────────────────────────────────────────────────────────
+  // --- Token helpers ---
 
   static Future<String?> getToken() async {
     final prefs = await SharedPreferences.getInstance();
@@ -26,23 +33,37 @@ class ApiService {
     await prefs.remove(AppConfig.userKey);
   }
 
-  // ── HTTP helpers ───────────────────────────────────────────────────────────
+  // --- HTTP helpers ---
 
   static Future<Map<String, String>> _headers({bool auth = true}) async {
     final headers = <String, String>{'Content-Type': 'application/json'};
     if (auth) {
       final token = await getToken();
-      if (token != null) headers['Authorization'] = 'Bearer $token';
+      if (token != null) {
+        headers['Authorization'] = 'Bearer $token';
+      }
     }
     return headers;
   }
 
   static Map<String, dynamic> _decode(http.Response res) {
-    final body = jsonDecode(res.body) as Map<String, dynamic>;
-    if (res.statusCode >= 400) {
-      throw ApiException(body['error']?.toString() ?? 'Request failed', res.statusCode);
+    if (res.body.trim().isEmpty) {
+      throw ApiException('Empty response from server', res.statusCode);
     }
-    return body;
+
+    final decoded = jsonDecode(res.body);
+    if (decoded is! Map<String, dynamic>) {
+      throw ApiException('Unexpected response from server', res.statusCode);
+    }
+
+    if (res.statusCode >= 400) {
+      throw ApiException(
+        decoded['error']?.toString() ?? 'Request failed',
+        res.statusCode,
+      );
+    }
+
+    return decoded;
   }
 
   static Uri _uri(String path, [Map<String, String>? params]) {
@@ -50,7 +71,25 @@ class ApiService {
     return params != null ? uri.replace(queryParameters: params) : uri;
   }
 
-  // ── Auth ───────────────────────────────────────────────────────────────────
+  static Map<String, dynamic> _requireAuthPayload(Map<String, dynamic> body) {
+    final token = body['token'];
+    final user = body['user'];
+
+    if (token is! String || token.isEmpty) {
+      throw const ApiException('Server did not return a valid token', 500);
+    }
+
+    if (user is! Map<String, dynamic>) {
+      throw const ApiException('Server did not return valid user data', 500);
+    }
+
+    return {
+      'token': token,
+      'user': user,
+    };
+  }
+
+  // --- Auth ---
 
   static Future<Map<String, dynamic>> register({
     required String name,
@@ -61,11 +100,18 @@ class ApiService {
     final res = await http.post(
       _uri('/auth/register'),
       headers: await _headers(auth: false),
-      body: jsonEncode({'name': name, 'email': email, 'password': password, 'major': major ?? ''}),
+      body: jsonEncode({
+        'name': name,
+        'email': email,
+        'password': password,
+        'major': major ?? '',
+      }),
     );
-    return _decode(res);
+    return _requireAuthPayload(_decode(res));
   }
 
+  /// Sends email and password to `/auth/login`.
+  /// The backend verifies the account and returns `token` plus `user`.
   static Future<Map<String, dynamic>> login({
     required String email,
     required String password,
@@ -73,12 +119,15 @@ class ApiService {
     final res = await http.post(
       _uri('/auth/login'),
       headers: await _headers(auth: false),
-      body: jsonEncode({'email': email, 'password': password}),
+      body: jsonEncode({
+        'email': email,
+        'password': password,
+      }),
     );
-    return _decode(res);
+    return _requireAuthPayload(_decode(res));
   }
 
-  // ── User profile ───────────────────────────────────────────────────────────
+  // --- User profile ---
 
   static Future<Map<String, dynamic>> getMe() async {
     final res = await http.get(_uri('/users/me'), headers: await _headers());
@@ -94,7 +143,7 @@ class ApiService {
     return _decode(res);
   }
 
-  // ── Reminders ──────────────────────────────────────────────────────────────
+  // --- Reminders ---
 
   static Future<Map<String, dynamic>> getReminders() async {
     final res = await http.get(_uri('/reminders'), headers: await _headers());
@@ -110,7 +159,7 @@ class ApiService {
     return _decode(res);
   }
 
-  // ── Subjects ───────────────────────────────────────────────────────────────
+  // --- Subjects ---
 
   static Future<Map<String, dynamic>> getSubjects() async {
     final res = await http.get(_uri('/subjects'), headers: await _headers());
@@ -126,7 +175,10 @@ class ApiService {
     return _decode(res);
   }
 
-  static Future<Map<String, dynamic>> updateSubject(String id, Map<String, dynamic> data) async {
+  static Future<Map<String, dynamic>> updateSubject(
+    String id,
+    Map<String, dynamic> data,
+  ) async {
     final res = await http.put(
       _uri('/subjects/$id'),
       headers: await _headers(),
@@ -140,7 +192,7 @@ class ApiService {
     return _decode(res);
   }
 
-  // ── Schedules ──────────────────────────────────────────────────────────────
+  // --- Schedules ---
 
   static Future<Map<String, dynamic>> getSchedules({String? date}) async {
     final res = await http.get(
@@ -160,7 +212,10 @@ class ApiService {
   }
 
   static Future<Map<String, dynamic>> toggleScheduleComplete(String id) async {
-    final res = await http.patch(_uri('/schedules/$id/complete'), headers: await _headers());
+    final res = await http.patch(
+      _uri('/schedules/$id/complete'),
+      headers: await _headers(),
+    );
     return _decode(res);
   }
 
@@ -169,7 +224,7 @@ class ApiService {
     return _decode(res);
   }
 
-  // ── Tasks ──────────────────────────────────────────────────────────────────
+  // --- Tasks ---
 
   static Future<Map<String, dynamic>> getTasks({bool? completed}) async {
     final params = completed != null ? {'completed': completed.toString()} : null;
@@ -192,7 +247,10 @@ class ApiService {
   }
 
   static Future<Map<String, dynamic>> toggleTaskComplete(String id) async {
-    final res = await http.patch(_uri('/tasks/$id/complete'), headers: await _headers());
+    final res = await http.patch(
+      _uri('/tasks/$id/complete'),
+      headers: await _headers(),
+    );
     return _decode(res);
   }
 
@@ -202,10 +260,10 @@ class ApiService {
   }
 }
 
-/// Thrown when the server returns a 4xx / 5xx response.
 class ApiException implements Exception {
   final String message;
   final int statusCode;
+
   const ApiException(this.message, this.statusCode);
 
   @override

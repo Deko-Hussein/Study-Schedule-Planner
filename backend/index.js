@@ -7,11 +7,11 @@ const { isLocalDataMode, localDataFallbackEnabled, setLocalDataMode } = require(
 require('dotenv').config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 const MONGO_URI = process.env.MONGO_URI;
-const RETRY_DELAY_MS = Number(process.env.MONGO_RETRY_DELAY_MS) || 5000;
+const RETRY_DELAY_MS = Number(process.env.MONGO_RETRY_DELAY_MS) || 3000;
 const MONGO_SERVER_SELECTION_TIMEOUT_MS =
-  Number(process.env.MONGO_SERVER_SELECTION_TIMEOUT_MS) || 5000;
+  Number(process.env.MONGO_SERVER_SELECTION_TIMEOUT_MS) || 3000;
 const MONGO_ADDRESS_FAMILY =
   process.env.MONGO_ADDRESS_FAMILY === '4' || process.env.MONGO_ADDRESS_FAMILY === '6'
     ? Number(process.env.MONGO_ADDRESS_FAMILY)
@@ -383,22 +383,22 @@ async function connectToMongo() {
 function startServer() {
   if (!serverStarted) {
     const server = app.listen(PORT, () => {
+      serverStarted = true;
       console.log(`Server running on http://localhost:${PORT}`);
+      connectToMongo();
     });
 
     server.on('error', (err) => {
       if (err.code === 'EADDRINUSE') {
         console.error(`Port ${PORT} is already in use. Stop the other server or change PORT in backend/.env.`);
+        process.exitCode = 1;
         return;
       }
 
       console.error('Server startup error:', err);
+      process.exitCode = 1;
     });
-
-    serverStarted = true;
   }
-
-  connectToMongo();
 }
 
 startServer();
