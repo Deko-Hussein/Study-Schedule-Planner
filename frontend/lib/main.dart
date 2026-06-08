@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -22,6 +23,15 @@ class StudyPlannerApp extends StatelessWidget {
     return MaterialApp(
       title: 'Study Schedule Planner',
       debugShowCheckedModeBanner: false,
+      scrollBehavior: const MaterialScrollBehavior().copyWith(
+        dragDevices: {
+          PointerDeviceKind.touch,
+          PointerDeviceKind.mouse,
+          PointerDeviceKind.trackpad,
+          PointerDeviceKind.stylus,
+          PointerDeviceKind.unknown,
+        },
+      ),
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(

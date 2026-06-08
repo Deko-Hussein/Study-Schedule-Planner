@@ -70,7 +70,6 @@ class _SplashScreenState extends State<SplashScreen>
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-<<<<<<< HEAD
                 StudyPlannerLogoBadge(
                   size: 88,
                   backgroundColor: Colors.white,
@@ -80,27 +79,6 @@ class _SplashScreenState extends State<SplashScreen>
                       color: AppColor.kPrimaryColor.withValues(alpha: 0.12),
                       blurRadius: 24,
                       offset: const Offset(0, 8),
-=======
-                Container(
-                  width: 88,
-                  height: 88,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(24),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColor.kPrimaryColor.withValues(alpha: 0.12),
-                        blurRadius: 24,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
-                  ),
-                  child: const Center(
-                    child: Icon(
-                      Icons.school_rounded,
-                      size: 44,
-                      color: AppColor.kPrimaryColor,
->>>>>>> 32bc85c5f392e098a181db65d1e8fda72c5e3890
                     ),
                   ],
                 ),

@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../components/home_screen_sections.dart';
 import '../../utils/exports.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -31,7 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final Set<String> _updatingTaskIds = <String>{};
   List<ScheduleTask> _tasks = <ScheduleTask>[];
 
-  final List<String> categories = const [
+  final List<String> _categories = const [
     'All',
     'Study',
     'Assignment',
@@ -54,10 +55,10 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
-  List<ScheduleTask> get filteredTasks {
+  List<ScheduleTask> get _filteredTasks {
     return _tasks.where((task) {
       final matchesCategory = selectedCategory == 0 ||
-          task.category == categories[selectedCategory];
+          task.category == _categories[selectedCategory];
 
       final matchesFilter = selectedFilter == 0 ||
           selectedFilter == 1 && !task.completed ||
@@ -111,7 +112,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Future<void> toggleTask(ScheduleTask task) async {
+  Future<void> _toggleTask(ScheduleTask task) async {
     if (_updatingTaskIds.contains(task.id)) return;
 
     setState(() => _updatingTaskIds.add(task.id));
@@ -158,77 +159,34 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final filteredTasks = _filteredTasks;
     final completedCount = _tasks.where((task) => task.completed).length;
 
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 18, 20, 0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              TopBar(
+        child: RefreshIndicator(
+          onRefresh: _loadTasks,
+          child: CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(
+              parent: BouncingScrollPhysics(),
+            ),
+            slivers: [
+              HomeOverviewSliver(
                 onProfileTap: widget.onProfileTap,
                 onNotificationTap: widget.onNotificationTap,
-              ),
-              const SizedBox(height: 28),
-              const MonthCard(),
-              const SizedBox(height: 20),
-              const WeekTimeline(),
-              const SizedBox(height: 28),
-              ScheduleHeader(
-                selected: selectedFilter,
-                onChanged: (index) {
-                  setState(() {
-                    selectedFilter = index;
-                  });
+                selectedFilter: selectedFilter,
+                onFilterChanged: (index) {
+                  setState(() => selectedFilter = index);
                 },
-              ),
-              const SizedBox(height: 18),
-              CategoryChips(
-                selected: selectedCategory,
-                onChanged: (index) {
-                  setState(() {
-                    selectedCategory = index;
-                  });
+                selectedCategory: selectedCategory,
+                onCategoryChanged: (index) {
+                  setState(() => selectedCategory = index);
                 },
+                completedCount: completedCount,
+                totalCount: _tasks.length,
               ),
-              const SizedBox(height: 28),
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      'Upcoming Tasks',
-                      style: GoogleFonts.inter(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w800,
-                        color: AppColor.kSecondColor,
-                      ),
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColor.kbgColor,
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Text(
-                      '$completedCount/${_tasks.length} done',
-                      style: GoogleFonts.inter(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                        color: AppColor.kPrimaryColor,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 18),
-              Expanded(child: _buildTaskBody()),
+              ..._buildTaskSlivers(filteredTasks),
             ],
           ),
         ),
@@ -236,137 +194,66 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildTaskBody() {
+  List<Widget> _buildTaskSlivers(List<ScheduleTask> filteredTasks) {
     if (_loading) {
-      return const Center(
-        child: CircularProgressIndicator(color: AppColor.kPrimaryColor),
-      );
+      return const [
+        SliverFillRemaining(
+          hasScrollBody: false,
+          child: Center(
+            child: CircularProgressIndicator(color: AppColor.kPrimaryColor),
+          ),
+        ),
+      ];
     }
 
     if (_authRequired) {
-      return const _StatusMessage(
-        message: 'Log in to see your saved tasks.',
-        actionLabel: null,
-        onTap: null,
-      );
+      return const [
+        SliverFillRemaining(
+          hasScrollBody: false,
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(20, 0, 20, 28),
+            child: HomeMessageCard(
+              message: 'Log in to see your saved tasks.',
+              actionLabel: null,
+              onTap: null,
+            ),
+          ),
+        ),
+      ];
     }
 
     if (_error != null) {
-      return _StatusMessage(
-        message: 'Could not load tasks.',
-        actionLabel: 'Retry',
-        onTap: _loadTasks,
-      );
+      return [
+        SliverFillRemaining(
+          hasScrollBody: false,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 28),
+            child: HomeMessageCard(
+              message: 'Could not load tasks.',
+              actionLabel: 'Retry',
+              onTap: _loadTasks,
+            ),
+          ),
+        ),
+      ];
     }
 
     if (filteredTasks.isEmpty) {
-      return RefreshIndicator(
-        onRefresh: _loadTasks,
-        child: ListView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          children: const [
-            SizedBox(height: 120),
-            Center(child: _EmptyMessage()),
-          ],
+      return const [
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(20, 72, 20, 28),
+            child: Center(child: HomeEmptyStateCard()),
+          ),
         ),
-      );
+      ];
     }
 
-    return RefreshIndicator(
-      onRefresh: _loadTasks,
-      child: ListView.separated(
-        physics: const AlwaysScrollableScrollPhysics(
-            parent: BouncingScrollPhysics()),
-        padding: const EdgeInsets.only(bottom: 28),
-        itemCount: filteredTasks.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 14),
-        itemBuilder: (context, index) {
-          final task = filteredTasks[index];
-
-          return TaskCard(
-            task: task,
-            onTap: () => toggleTask(task),
-          );
-        },
+    return [
+      HomeTaskListSliver(
+        tasks: filteredTasks,
+        onTaskTap: _toggleTask,
       ),
-    );
-  }
-}
-
-class _StatusMessage extends StatelessWidget {
-  final String message;
-  final String? actionLabel;
-  final Future<void> Function()? onTap;
-
-  const _StatusMessage({
-    required this.message,
-    required this.actionLabel,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
-        decoration: BoxDecoration(
-          color: AppColor.kbgColor,
-          borderRadius: BorderRadius.circular(24),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(
-              Icons.calendar_today_rounded,
-              color: AppColor.kPrimaryColor,
-              size: 28,
-            ),
-            const SizedBox(height: 12),
-            Text(
-              message,
-              style: GoogleFonts.inter(
-                color: AppColor.kTextStyleColorGray,
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            if (actionLabel != null) ...[
-              const SizedBox(height: 14),
-              TextButton(
-                onPressed: onTap == null ? null : () => onTap!.call(),
-                child: Text(actionLabel!),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _EmptyMessage extends StatelessWidget {
-  const _EmptyMessage();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 12),
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
-      decoration: BoxDecoration(
-        color: AppColor.kbgColor,
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: Text(
-        'No tasks match this filter.',
-        style: GoogleFonts.inter(
-          color: AppColor.kTextStyleColorGray,
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-        ),
-        textAlign: TextAlign.center,
-      ),
-    );
+    ];
   }
 }

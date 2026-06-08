@@ -1,2 +1,7 @@
 backend/.env
 backend/.local-data.json
+frontend/android/key.properties
+frontend/android/*.jks
+frontend/android/*.keystore
+frontend/android/app/*.jks
+frontend/android/app/*.keystore

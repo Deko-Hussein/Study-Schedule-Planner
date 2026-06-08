@@ -1,11 +1,11 @@
 {
-    "name": "frontend",
-    "short_name": "frontend",
+    "name": "Study Planner",
+    "short_name": "Study Planner",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#ffffff",
-    "theme_color": "#42a5f5",
-    "description": "A new Flutter project.",
+    "theme_color": "#2563EB",
+    "description": "A study planning app for schedules, tasks, and reminders.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
